@@ -34,9 +34,9 @@ def createcoll():
                  collection["File"+str(x)] = i
                  x+=1
             print(collection)
+            with open("Collections/"+name+".json", "w") as w:
+                json.dump(collection, w)
 
-            with open(name+".json", "w") as w:
-                 json.dump(collection, w)
             complete = ttk.Label(Setup, text = name+" Successfully Created")
             complete.pack()
             sleep(2)
@@ -87,7 +87,7 @@ colllab = ttk.Label(text = collstr)
 colllab.pack()
 def updatecolls():
     global collstr
-    for root, dirs, files in os.walk(os.getcwd()):
+    for root, dirs, files in os.walk(os.path.join(os.getcwd(), "Collections")):
         for file in files:
             if file.endswith(".json"):
                 if collstr.find(file) == -1:
@@ -96,6 +96,8 @@ def updatecolls():
     up = threading.Timer(5,updatecolls)
     up.start()
     return collstr
+if not os.path.exists(os.path.join(os.getcwd(), "Collections")):
+    os.mkdir(os.path.join(os.getcwd(), "Collections"))
 
 updatecolls()
 tk.mainloop()
