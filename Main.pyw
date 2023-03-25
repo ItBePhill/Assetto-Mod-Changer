@@ -1,15 +1,20 @@
 import tkinter as tk
 from tkinter import ttk
 import tkfilebrowser
+from tkinter import messagebox
 import threading
 import os
 import json
+import shutil
 from time import sleep
 paths = {
     "destination" : r"D:\programing languages\Python\Assetto Mod Changer"
 }
 collection = {
     "name" : "AYO DEVIL MAY CRY ANIME??????"
+}
+collections = {
+
 }
 
 
@@ -36,6 +41,10 @@ def createcoll():
             print(collection)
             with open("Collections/"+name+".json", "w") as w:
                 json.dump(collection, w)
+
+            os.mkdir(os.path.join(os.getcwd(), name))
+            for i in fd:
+                shutil.copyfile(i, os.path.join(os.getcwd(), name))
 
             complete = ttk.Label(Setup, text = name+" Successfully Created")
             complete.pack()
@@ -74,6 +83,16 @@ def createcoll():
 def removecoll():
     print("Removecoll")
 #Setup-----------------------------------------------
+def Switch(c):
+    global current
+    if messagebox.askyesnocancel(title = "Are you sure you want to change?", message = "Are you sure you want to change collection (It may take some time)"):
+       current = c.replace('_', ' ')
+       currlab.config(text = "Currently Selected: " + os.path.splitext(current)[0])
+       return current
+
+    
+
+current  = ""
 collstr = ""
 ver = ttk.Label(text = "Version 0.1", foreground= "Grey")
 ver.pack(anchor = "nw")
@@ -81,10 +100,10 @@ cc = ttk.Button(text = "Create Collection", command = createcoll)
 cc.pack()
 rc = ttk.Button(text = "Remove Collection", command = removecoll)
 rc.pack()
+currlab = ttk.Label(text = "Currently Selected: " + os.path.splitext(current)[0])
+currlab.pack(pady = 10)
 created = ttk.Label(text = "P.S Collections Refresh every 5 seconds\nCreated Collections:")
 created.pack()
-colllab = ttk.Label(text = collstr)
-colllab.pack()
 def updatecolls():
     global collstr
     for root, dirs, files in os.walk(os.path.join(os.getcwd(), "Collections")):
@@ -92,7 +111,9 @@ def updatecolls():
             if file.endswith(".json"):
                 if collstr.find(file) == -1:
                     collstr += "\n"+file
-                    colllab.config(text = collstr)
+                    collections[file] = ttk.Button(text = os.path.splitext(file)[0].replace('_', ' '), command = lambda i = file: Switch(i))
+                    collections[file].pack()
+
     up = threading.Timer(5,updatecolls)
     up.start()
     return collstr
