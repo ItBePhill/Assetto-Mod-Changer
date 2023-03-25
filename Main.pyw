@@ -8,6 +8,8 @@ import json
 import shutil
 import datetime
 from time import sleep
+
+version = "0.1"
 paths = {
     "destination" : r"D:\programing languages\Python\Assetto Mod Changer"
 }
@@ -20,15 +22,19 @@ collections = {
 logs = []
 if not os.path.exists(os.path.join(os.getcwd(), "Logs")):
     os.mkdir(os.path.join(os.getcwd(), "Logs"))
-for i in os.listdir():
+
+for i in os.listdir(os.path.join(os.getcwd(), "Logs")):
     if i.endswith(".txt"):
         logs.append(i)
+    
+if not os.path.exists(os.path.join(os.getcwd(), "Collections")):
+    os.mkdir(os.path.join(os.getcwd(), "Collections"))
 
 fl = []
 selected = None
 root = tk.Tk()
 root.geometry("800x600")
-root.title("Assetto Mod Changer v2 ver 0.1")
+root.title("Assetto Mod Changer v2 ver: "+version)
 #Setup------------------------------------------------------
 def Log(ob):
     now = datetime.datetime.now()
@@ -106,13 +112,14 @@ def Switch(c):
     if messagebox.askyesnocancel(title = "Are you sure you want to change?", message = "Are you sure you want to change collection (It may take some time)"):
        current = c.replace('_', ' ')
        currlab.config(text = "Currently Selected: " + os.path.splitext(current)[0])
+       Log("Changed Collection to "+ current)
        return current
 
     
 
 current  = ""
 collstr = ""
-ver = ttk.Label(text = "Version 0.1", foreground= "Grey")
+ver = ttk.Label(text = "Version: "+version, foreground= "Grey")
 ver.pack(anchor = "nw")
 cc = ttk.Button(text = "Create Collection", command = createcoll)
 cc.pack()
@@ -136,8 +143,6 @@ def updatecolls():
     up = threading.Timer(5,updatecolls)
     up.start()
     return collstr
-if not os.path.exists(os.path.join(os.getcwd(), "Collections")):
-    os.mkdir(os.path.join(os.getcwd(), "Collections"))
 
 updatecolls()
 tk.mainloop()
