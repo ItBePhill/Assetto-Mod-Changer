@@ -6,6 +6,7 @@ import threading
 import os
 import json
 import shutil
+import datetime
 from time import sleep
 paths = {
     "destination" : r"D:\programing languages\Python\Assetto Mod Changer"
@@ -16,7 +17,12 @@ collection = {
 collections = {
 
 }
-
+logs = []
+if not os.path.exists(os.path.join(os.getcwd(), "Logs")):
+    os.mkdir(os.path.join(os.getcwd(), "Logs"))
+for i in os.listdir():
+    if i.endswith(".txt"):
+        logs.append(i)
 
 fl = []
 selected = None
@@ -24,6 +30,14 @@ root = tk.Tk()
 root.geometry("800x600")
 root.title("Assetto Mod Changer v2 ver 0.1")
 #Setup------------------------------------------------------
+def Log(ob):
+    now = datetime.datetime.now()
+    ob = str(ob)
+    final = "\n"+now.strftime("%Y-%m-%d %H:%M:%S") + ": " + ob
+    print(final)
+    f = open(os.path.join(os.getcwd(), "Logs/") + str(len(logs))+ " " +now.strftime("%Y-%m-%d")+ " log.txt" , "a")
+    f.write(final)
+    f.close()
 def createcoll():
     Setup =  tk.Toplevel(root)
     Setup.geometry("400x300")
@@ -38,13 +52,13 @@ def createcoll():
             for i in fd:
                  collection["File"+str(x)] = i
                  x+=1
-            print(collection)
+            Log(collection)
             with open("Collections/"+name+".json", "w") as w:
                 json.dump(collection, w)
 
-            os.mkdir(os.path.join(os.getcwd(), name))
+            os.mkdir(os.path.join(os.getcwd(), "Collections", name))
             for i in fd:
-                shutil.copyfile(i, os.path.join(os.getcwd(), name))
+                shutil.copyfile(i, os.path.join(os.getcwd(), "Collections", name))
 
             complete = ttk.Label(Setup, text = name+" Successfully Created")
             complete.pack()
@@ -54,11 +68,15 @@ def createcoll():
                 
             
         global selected
+        paths["destination"] = dest.get()
         fd = tkfilebrowser.askopendirnames(title = "Select the files you want to be in the collection", initialdir = paths["destination"])
         strfd = ""
         for i in fd:
             strfd = strfd + os.path.basename(i)+"\n"
-        if selected == None:
+        try:
+            selected.config(text = strfd)
+        except Exception as e:
+            Log(str(e) + " (Don't worry this is supposed to happen!)")
             selected = ttk.Label(Setup, text = strfd)
             selected.pack()
             cont = ttk.Button(Setup, text = "Create Collection", command = Create)
@@ -66,7 +84,7 @@ def createcoll():
         else:
             selected.config(text = strfd)
         return selected
-    print("Createcoll")
+    Log("Createcoll")
     destlab = ttk.Label(Setup, text = "Assetto Corsa Folder:")
     destlab.pack()
     dest = ttk.Entry(Setup, width = "100")
@@ -113,6 +131,7 @@ def updatecolls():
                     collstr += "\n"+file
                     collections[file] = ttk.Button(text = os.path.splitext(file)[0].replace('_', ' '), command = lambda i = file: Switch(i))
                     collections[file].pack()
+                    Log("Updated "+str(collections))
 
     up = threading.Timer(5,updatecolls)
     up.start()
