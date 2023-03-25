@@ -8,6 +8,14 @@ import json
 import shutil
 import datetime
 from time import sleep
+#Assetto Mod Changer Ver 0.1
+#Made By Phillip Wood
+#https://github.com/ItBePhill/Assetto-Mod-Changer
+#If you didn't get this from me or my Github it is not legit and should be deleted as it may be altered!
+# I do not Charge for what I make so if you paid for this refund it and delete it as it may be altered!
+
+
+
 
 version = "0.1"
 paths = {
