@@ -47,7 +47,7 @@ root.title("Assetto Mod Changer v2 ver: "+version)
 def Log(ob):
     now = datetime.datetime.now()
     ob = str(ob)
-    final = "\n"+now.strftime("%Y-%m-%d %H:%M:%S") + ": " + ob
+    final = "\n\n"+now.strftime("%Y-%m-%d %H:%M:%S") + ": " + ob
     print(final)
     f = open(os.path.join(os.getcwd(), "Logs/") + str(len(logs))+ " " +now.strftime("%Y-%m-%d")+ " log.txt" , "a")
     f.write(final)
