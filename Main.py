@@ -86,8 +86,22 @@ def createcoll():
     namelab.pack()
     nameent = ttk.Entry(Setup)
     nameent.pack(pady = 10)
-    filelab = ttk.Label(Setup, text = "Select Mods to Add:")
+    filelab = ttk.Label(Setup, text = "Mods added:")
     filelab.pack()
+    def selectmods():
+        def delete(x):
+            fd.pop(x)
+            fdbutt[x].pack_forget()
+            Log(fd)
+        global selected
+        global fd
+        fd = tkfilebrowser.askopendirnames()
+        fd = list(fd)
+        fdbutt = []
+        for i in range(len(fd)):
+            fdbutt.append(ttk.Button(text = fd[i], command = lambda x = i: delete(x)))
+            fdbutt[i].pack()
+        return selected, fd
     def Create():
         name = nameent.get()
         name = name.replace(' ', '_')
@@ -112,23 +126,10 @@ def createcoll():
         sleep(2)
         Setup.destroy()
     paths["destination"] = dest.get()
-    boxlab = ttk.Label(Setup,text = "Choose the files you want in the collection click select folder to choose that mod and cancel to stop selecting")
-    boxlab.pack()
     cont = ttk.Button(Setup, text = "Create Collection", command = Create)
     cont.pack()
-    fd = []
-    fds = "l"
-    strfd = ""
-    fd = tkfilebrowser.askopendirnames()
-    try:
-        selected.config(text = strfd)
-    except Exception as e:
-        Log(e)
-        selected = ttk.Label(Setup, text = strfd)
-        selected.pack()
-    
-    else:
-        selected.config(text = strfd)
+    mods = ttk.Button(text = "Add or remove mods", command = selectmods)
+    mods.pack()
 
 
 def removecoll():
@@ -152,10 +153,11 @@ def advanced():
                 Log("Cleared Paths")
                 os.remove(os.path.join(os.getcwd(), "Paths.json"))
         elif c == "L":
-            if messagebox.askokcancel(title = "Clear", message = "Clear Logs?"):
+            if messagebox.askokcancel(title = "Clear", message = "Clear Logs? Warning: this will restart the program"):
                 f.close()
                 shutil.rmtree(os.path.join(os.getcwd(), "Logs"))
                 Log("Cleared Logs")
+                sys.exec()
         elif c == "C":
             if messagebox.askokcancel(title = "Clear", message = "Clear Collections?"):
                 Log("Cleared Collections")
