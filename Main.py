@@ -12,7 +12,7 @@ import tkfilebrowser
 #Assetto Mod Changer Ver 0.1
 #Made By Phillip Wood
 #https://github.com/ItBePhill/Assetto-Mod-Changer
-#py installer commandpyinstaller --noconfirm --onefile --console --add-data "C:/Users/phill/AppData/Local/Programs/Python/Python310/Lib/site-packages/tkfilebrowser;tkfilebrowser/"  "D:/programing languages/Python/Assetto Mod Changer/Main.py"
+#py installer command pyinstaller --noconfirm --onefile --console --add-data "C:/Users/phill/AppData/Local/Programs/Python/Python310/Lib/site-packages/tkfilebrowser;tkfilebrowser/"  "D:/programing languages/Python/Assetto Mod Changer/Main.py"
 #If you didn't get this from me or my Github it is not legit and should be deleted as it may be altered!
 # I do not Charge for what I make so if you paid for this refund it and delete it as it may be altered!
 #FUCK YOU MICROSFT YOU PIECES OF SHIT!
@@ -25,9 +25,18 @@ def Log(ob):
     f = open(os.path.join(os.getcwd(), "Logs", str(len(logs)))+ " " +now.strftime("%Y-%m-%d")+ " log.txt" , "a")
     f.write(final)
     return f
+logs = []
+if not os.path.exists(os.path.join(os.getcwd(), "Collections")):
+    os.mkdir(os.path.join(os.getcwd(), "Collections"))
 
+if not os.path.exists(os.path.join(os.getcwd(), "Logs")):
+    os.mkdir(os.path.join(os.getcwd(), "Logs"))
 
+for i in os.listdir(os.path.join(os.getcwd(), "Logs")):
+    if i.endswith(".txt"):
+        logs.append(i)
 
+Log("Started")
 version = "0.1"
 paths = {
     "destination" : r"D:\programing languages\Python\Assetto Mod Changer"
@@ -38,16 +47,7 @@ collection = {
 collections = {
 
 }
-logs = []
-if not os.path.exists(os.path.join(os.getcwd(), "Logs")):
-    os.mkdir(os.path.join(os.getcwd(), "Logs"))
 
-for i in os.listdir(os.path.join(os.getcwd(), "Logs")):
-    if i.endswith(".txt"):
-        logs.append(i)
-    
-if not os.path.exists(os.path.join(os.getcwd(), "Collections")):
-    os.mkdir(os.path.join(os.getcwd(), "Collections"))
 try:
     with open("Paths.json", "r") as r:
         data = json.load(r)
@@ -99,7 +99,7 @@ def createcoll():
         fd = list(fd)
         fdbutt = []
         for i in range(len(fd)):
-            fdbutt.append(ttk.Button(text = fd[i], command = lambda x = i: delete(x)))
+            fdbutt.append(ttk.Button(Setup, text = fd[i], command = lambda x = i: delete(x)))
             fdbutt[i].pack()
         return selected, fd
     def Create():
@@ -128,7 +128,7 @@ def createcoll():
     paths["destination"] = dest.get()
     cont = ttk.Button(Setup, text = "Create Collection", command = Create)
     cont.pack()
-    mods = ttk.Button(text = "Add or remove mods", command = selectmods)
+    mods = ttk.Button(Setup, text = "Add or remove mods", command = selectmods)
     mods.pack()
 
 
@@ -154,15 +154,40 @@ def advanced():
                 os.remove(os.path.join(os.getcwd(), "Paths.json"))
         elif c == "L":
             if messagebox.askokcancel(title = "Clear", message = "Clear Logs? Warning: this will restart the program"):
+                Log("Cleared Logs")
+                Log("Clearing and Restarting...")
                 f.close()
                 shutil.rmtree(os.path.join(os.getcwd(), "Logs"))
-                Log("Cleared Logs")
-                sys.exec()
+                import sys
+                if os.path.basename(sys.argv[0]).endswith(".exe"):
+                    try:
+                        root.quit()
+                        root.destroy()
+                        subprocess.check_call(sys.argv[0])
+                        sleep(1)
+                        quit(0)
+                    except Exception as e:
+                        if messagebox.showerror(title = "An error occured", message = "Something went wrong! Error: " + str(e)):
+                            root.quit()
+                            root.destroy()
+                            quit(0)
+                else:
+                    try:
+                        root.quit()
+                        root.destroy()
+                        subprocess.check_call("python "+'"'+sys.argv[0]+'"')
+                        sleep(1)
+                        quit(0)
+                    except Exception as e:
+                        if messagebox.showerror(title = "An error occured", message = "Something went wrong! Error: " + str(e)):
+                            root.quit()
+                            root.destroy()
+                            quit(0)
         elif c == "C":
             if messagebox.askokcancel(title = "Clear", message = "Clear Collections?"):
                 Log("Cleared Collections")
                 shutil.rmtree(os.path.join(os.getcwd(), "Collections"))
-            
+             
     Log("advanced")
     advwin = tk.Toplevel(root)
     advwin.geometry("400x300")
@@ -214,7 +239,6 @@ def on_closing():
             json.dump(paths, w)
             w.close()
         root.destroy()
-        quit()
-    f.close()
+        quit(0)
 root.protocol("WM_DELETE_WINDOW", on_closing)
 root.mainloop()
